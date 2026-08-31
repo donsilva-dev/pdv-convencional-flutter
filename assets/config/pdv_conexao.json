@@ -1,0 +1,14 @@
+{
+	"offline": {
+		"titulo": "PDV FORA DE COMUNICAÇÃO",
+		"mensagem": "Não foi possível comunicar com o sistema do caixa.",
+		"orientacao": "Aguarde enquanto tentamos restabelecer a conexão.",
+		"animacao": "assets/lottie/pdv_offline.json"
+	},
+	"reconectando": {
+		"titulo": "RECONECTANDO AO PDV",
+		"mensagem": "Estamos tentando restabelecer a comunicação.",
+		"orientacao": "Não desligue o equipamento.",
+		"animacao": "assets/lottie/pdv_offline.json"
+	}
+}
