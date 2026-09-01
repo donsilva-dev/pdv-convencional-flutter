@@ -3,8 +3,8 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pdv_convencional/widgets/pdv_conexao_overlay.dart';
+import 'package:pdv_convencional/widgets/pdv_consulta_overlay.dart';
 import 'package:pdv_convencional/widgets/pdv_recebimento_overlay.dart';
-
 import 'package:pdv_convencional/widgets/pdv_display.dart';
 import 'package:pdv_convencional/widgets/pdv_footer.dart';
 import 'package:pdv_convencional/widgets/pdv_interface_overlay.dart';
@@ -35,8 +35,6 @@ class HomeScreen extends StatelessWidget {
           children: [
             // ==================================================
             // TELA DO PDV
-            // Imagem configurada pelo XML
-            // Ex.: estado1.bmp, venda.bmp, consulta.bmp...
             // ==================================================
             Positioned.fill(
               child: arquivo.existsSync()
@@ -50,30 +48,37 @@ class HomeScreen extends StatelessWidget {
             ),
 
             // ==================================================
-            // COMPONENTES DA TELA DE VENDA
+            // VENDA
             //
-            // Aqui serão desenhados os labels configurados
-            // pelos parâmetros do XML.
-            //
-            // Ex.:
-            // 1203 -> código do produto
-            //
-            // Só será exibido quando status == 3.
+            // Durante cancelamento, escondemos SOMENTE
+            // os dados da venda.
             // ==================================================
-            const PdvVendaOverlay(),
-            const PdvRecebimentoOverlay(),
+            if (!controller.telaCancelamentoAtiva.value)
+              const PdvVendaOverlay(),
+
+            // ==================================================
+            // RECEBIMENTO
+            // status == 4
+            // ==================================================
+            if (!controller.telaCancelamentoAtiva.value)
+              const PdvRecebimentoOverlay(),
+
+            // ==================================================
+            // CONSULTA
+            // status == 13
+            // ==================================================
+            const PdvConsultaOverlay(),
+
             // ==================================================
             // INTERFACE DINÂMICA
-            //
-            // Comandos:
-            // X|frmGeral|...
-            //
-            // Ex.: função 198.
+            // função 198
             // ==================================================
             const PdvInterfaceOverlay(),
 
             // ==================================================
             // DISPLAY INFERIOR
+            //
+            // CONTINUA APARECENDO NO CANCELAMENTO
             // ==================================================
             const Positioned(
               left: 0,
@@ -86,7 +91,11 @@ class HomeScreen extends StatelessWidget {
             // FOOTER
             // ==================================================
             const Positioned(left: 0, right: 0, bottom: 0, child: PdvFooter()),
+
+            // ==================================================
+            // CONEXÃO
             // SEMPRE POR ÚLTIMO
+            // ==================================================
             const Positioned.fill(child: PdvConexaoOverlay()),
           ],
         );

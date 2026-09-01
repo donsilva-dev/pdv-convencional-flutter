@@ -67,7 +67,7 @@ class PdvController extends GetxController {
   // ============================================================
   // INICIALIZAÇÃO
   // ============================================================
-  static const String _hostPdv = '192.168.0.104';
+  static const String _hostPdv = '192.168.0.107';
 
   static const int _portaPdv = 8082;
   @override
@@ -216,6 +216,29 @@ class PdvController extends GetxController {
     }
   }
 
+  void _processarConsultaProduto(List<String> partes) {
+    if (partes.length <= 9) {
+      return;
+    }
+
+    final codigo = _parseDoublePdv(partes[4]);
+    final descricao = partes[6].trim();
+
+    final valorUnitario = _parseDoublePdv(partes[7]);
+
+    final valorTotal = _parseDoublePdv(partes[8]);
+
+    final quantidade = _parseDoublePdv(partes[9]);
+
+    telaController.atualizarConsulta(
+      codigo: codigo,
+      descricao: descricao,
+      quantidade: quantidade,
+      valorUnitario: valorUnitario,
+      valorTotal: valorTotal,
+    );
+  }
+
   void _processarInformacao(PdvMessage mensagem) {
     print('======= RECEBEU I =======');
     print('RAW I: ${mensagem.raw}');
@@ -233,6 +256,10 @@ class PdvController extends GetxController {
 
     if (subtipo == '02') {
       _processarItemVenda(partes);
+    }
+    if (subtipo == '08') {
+      _processarConsultaProduto(partes);
+      return;
     }
     if (subtipo == '4' || subtipo == '10') {
       _processarRecebimento(partes);
@@ -270,64 +297,6 @@ class PdvController extends GetxController {
 
   double _parseDoublePdv(String valor) {
     return double.tryParse(valor.trim().replaceAll(',', '.')) ?? 0.0;
-  }
-
-  // void _processarInformacao(PdvMessage mensagem) {
-  //   final partes = mensagem.raw.split('|');
-
-  //   if (partes.length < 2) {
-  //     return;
-  //   }
-
-  //   final subtipo = partes[1].trim();
-
-  //   switch (subtipo) {
-  //     case '02':
-  //       _processarItemVenda(partes);
-  //       break;
-
-  //     case '9':
-  //       _processarInformacaoPreco(partes);
-  //       break;
-
-  //     default:
-  //       print('INFORMAÇÃO NÃO TRATADA: ${mensagem.raw}');
-  //       break;
-  //   }
-  // }
-
-  // void _processarItemVenda(List<String> partes) {
-  //   if (partes.length < 10) {
-  //     return;
-  //   }
-
-  //   final codigoProduto = _parte(partes, 5).trim();
-
-  //   final descricao = _parte(partes, 7).trim();
-
-  //   final valorUnitario = _parte(partes, 8).trim();
-
-  //   final valorTotal = _parte(partes, 9).trim();
-
-  //   print('======= ITEM VENDA =======');
-  //   print('CÓDIGO: $codigoProduto');
-  //   print('DESCRIÇÃO: $descricao');
-  //   print('VALOR UNITÁRIO: $valorUnitario');
-  //   print('VALOR TOTAL: $valorTotal');
-  //   print('==========================');
-
-  //   telaController.atualizarItemVenda(
-  //     codigo: codigoProduto,
-  //     descricao: descricao,
-  //     valorUnitario: valorUnitario,
-  //     valorTotal: valorTotal,
-  //   );
-  // }
-
-  void _processarInformacaoPreco(List<String> partes) {
-    final valor = _parte(partes, 2).trim();
-
-    print('INFORMAÇÃO PREÇO: $valor');
   }
 
   // ============================================================
@@ -388,7 +357,6 @@ class PdvController extends GetxController {
     }
 
     final subtipo = partes[1].trim();
-
     final codigo = int.tryParse(partes[2].trim());
 
     if (codigo == null) {
@@ -401,13 +369,6 @@ class PdvController extends GetxController {
     print('RAW: ${mensagem.raw}');
 
     telaController.processarFuncao(subtipo: subtipo, codigo: codigo);
-
-    // ============================================
-    // 111 - CANCELAR VENDA
-    // ============================================
-    if (codigo == 111) {
-      telaController.limparVenda();
-    }
   }
 
   // ============================================================

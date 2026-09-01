@@ -1,28 +1,3 @@
-// import 'package:device_preview/device_preview.dart';
-// import 'package:flutter/material.dart';
-// import 'package:get/get.dart';
-
-// import 'bindings/pdv_binding.dart';
-// import 'screens/pdv_screen.dart';
-
-// void main() {
-//   runApp(DevicePreview(enabled: true, builder: (context) => const PdvApp()));
-// }
-
-// class PdvApp extends StatelessWidget {
-//   const PdvApp({super.key});
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return GetMaterialApp(
-//       debugShowCheckedModeBanner: false,
-//       title: 'PDV Flutter',
-//       initialBinding: PdvBinding(),
-//       home: const PdvScreen(),
-//     );
-//   }
-// }
-
 import 'package:device_preview/device_preview.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -39,6 +14,7 @@ Future<void> main() async {
   final configService = PdvConfigService();
 
   final PdvConfig config = await configService.carregarConfig();
+
   runApp(
     DevicePreview(
       enabled: !kReleaseMode,
@@ -57,9 +33,7 @@ class PdvApp extends StatelessWidget {
     return GetMaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'PDV Convencional',
-
       initialBinding: PdvBinding(config: config),
-
       home: const HomeScreen(),
     );
   }

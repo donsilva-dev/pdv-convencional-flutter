@@ -37,6 +37,9 @@ class PdvRendererService {
         // RECEBIMENTO
         return buscar(1100)?.split(',').first.trim();
 
+      case 13:
+        return buscar(1215);
+
       default:
         return buscar(1001);
     }

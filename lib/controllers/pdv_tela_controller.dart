@@ -8,6 +8,7 @@ import '../widgets/pdv_draw_item.dart';
 
 class PdvTelaController extends GetxController {
   final List<PdvParametro> parametros;
+  bool _cancelamentoEfetivado = false;
 
   late final PdvRendererService renderer;
 
@@ -73,6 +74,15 @@ class PdvTelaController extends GetxController {
 
   final Rxn<PdvLabelConfig> labelItensVendidos = Rxn<PdvLabelConfig>();
 
+  final RxBool telaConsultaAtiva = false.obs;
+
+  final RxDouble consultaCodigo = 0.0.obs;
+  final RxString consultaDescricao = ''.obs;
+
+  final RxDouble consultaQuantidade = 0.0.obs;
+  final RxDouble consultaValorUnitario = 0.0.obs;
+  final RxDouble consultaValorTotal = 0.0.obs;
+
   // ============================================================
   // DADOS - VENDA
   // ============================================================
@@ -113,6 +123,22 @@ class PdvTelaController extends GetxController {
   // ============================================================
   // INICIALIZAÇÃO
   // ============================================================
+  final RxBool telaCancelamentoAtiva = false.obs;
+
+  void abrirTelaCancelamento() {
+    _cancelamentoEfetivado = false;
+    final imagemCancelamento = renderer.buscar(1220);
+
+    if (_imagemValida(imagemCancelamento)) {
+      imagem.value = imagemCancelamento!;
+    }
+
+    telaCancelamentoAtiva.value = true;
+  }
+
+  void fecharTelaCancelamento() {
+    telaCancelamentoAtiva.value = false;
+  }
 
   @override
   void onInit() {
@@ -166,6 +192,58 @@ class PdvTelaController extends GetxController {
 
   String get trocoFormatado {
     return _formatarMoeda(troco.value);
+  }
+
+  String get consultaQuantidadeFormatada {
+    return _formatarQuantidade(consultaQuantidade.value);
+  }
+
+  String get consultaCodigoFormatada {
+    return _formatarQuantidade(consultaCodigo.value);
+  }
+
+  String get consultaValorUnitarioFormatado {
+    return _formatarMoeda(consultaValorUnitario.value);
+  }
+
+  String get consultaValorTotalFormatado {
+    return _formatarMoeda(consultaValorTotal.value);
+  }
+
+  // ============================================================
+  // METODO DA CONSULTA PRODUTO
+  // ============================================================
+
+  void abrirTelaConsulta() {
+    telaConsultaAtiva.value = true;
+  }
+
+  void fecharTelaConsulta() {
+    telaConsultaAtiva.value = false;
+  }
+
+  void limparConsulta() {
+    consultaCodigo.value = 0.0;
+    consultaDescricao.value = '';
+
+    consultaQuantidade.value = 0.0;
+    consultaValorUnitario.value = 0.0;
+    consultaValorTotal.value = 0.0;
+  }
+
+  void atualizarConsulta({
+    required double codigo,
+    required String descricao,
+    required double quantidade,
+    required double valorUnitario,
+    required double valorTotal,
+  }) {
+    consultaCodigo.value = codigo;
+    consultaDescricao.value = descricao;
+
+    consultaQuantidade.value = quantidade;
+    consultaValorUnitario.value = valorUnitario;
+    consultaValorTotal.value = valorTotal;
   }
 
   // ============================================================
@@ -374,20 +452,60 @@ class PdvTelaController extends GetxController {
   void atualizarStatus(int novoStatus) {
     status.value = novoStatus;
 
+    // ==================================================
+    // CANCELAMENTO
+    // ==================================================
+    //
+    // Ao sair da tela de cancelamento para um status
+    // normal do fluxo, fechamos a tela.
+    //
+    // A venda só é limpa se o cancelamento realmente
+    // tiver sido efetivado.
+    // ==================================================
+    if (telaCancelamentoAtiva.value &&
+        (novoStatus == 2 || novoStatus == 3 || novoStatus == 4)) {
+      fecharTelaCancelamento();
+
+      if (_cancelamentoEfetivado) {
+        limparVenda();
+      }
+
+      _cancelamentoEfetivado = false;
+    }
+
+    // ==================================================
+    // INTERFACE DINÂMICA
+    // ==================================================
     if (novoStatus == 2 && telaInterfaceAtiva.value) {
       fecharInterface();
     }
 
+    // ==================================================
+    // CONSULTA
+    // ==================================================
+    if (novoStatus == 13) {
+      abrirTelaConsulta();
+    }
+
+    if (novoStatus != 13 && telaConsultaAtiva.value) {
+      fecharTelaConsulta();
+    }
+
+    // ==================================================
+    // IMAGEM DO STATUS
+    // ==================================================
     final novaImagem = renderer.imagemPorStatus(novoStatus);
 
     if (_imagemValida(novaImagem)) {
       imagem.value = novaImagem!;
     }
 
+    // ==================================================
+    // DISPLAY
+    // ==================================================
     barraDisplayVisivel.value = true;
 
     print('STATUS: $novoStatus');
-
     print('IMAGEM: ${imagem.value}');
   }
 
@@ -406,12 +524,28 @@ class PdvTelaController extends GetxController {
   // ============================================================
 
   void atualizarDisplay({required String esquerda, String direita = ''}) {
+    // ==================================================
+    // CANCELAMENTO EFETIVADO
+    // ==================================================
+    if (telaCancelamentoAtiva.value &&
+        esquerda.trim().toUpperCase() == 'GRAVACAO DO LOG') {
+      _cancelamentoEfetivado = true;
+
+      print('CANCELAMENTO EFETIVADO');
+    }
+
+    // ==================================================
+    // ITEM DA VENDA
+    // ==================================================
     if (_ehItemVenda(esquerda: esquerda, direita: direita)) {
       if (_processarItemDisplay(esquerda: esquerda, direita: direita)) {
         return;
       }
     }
 
+    // ==================================================
+    // ATUALIZA EMBALAGEM
+    // ==================================================
     if (_ehMensagemAtualizaEmbalagem(esquerda: esquerda, direita: direita)) {
       _mostrarDisplayCentralizado(
         '$esquerda $direita'.replaceAll(RegExp(r'\s+'), ' ').trim(),
@@ -420,6 +554,9 @@ class PdvTelaController extends GetxController {
       return;
     }
 
+    // ==================================================
+    // DISPLAY NORMAL
+    // ==================================================
     _mostrarDisplayNormal(esquerda: esquerda, direita: direita);
   }
 
@@ -509,26 +646,24 @@ class PdvTelaController extends GetxController {
 
   void processarFuncao({required String subtipo, required int codigo}) {
     subtipoFuncao.value = subtipo;
-
     codigoFuncao.value = codigo;
-
     ultimaFuncao.value = '$subtipo|$codigo';
-
     funcaoAtual.value = codigo;
-
     barraDisplayVisivel.value = true;
 
-    // Função 198:
-    // somente F|I|198 abre a interface.
-
-    if (codigo == 198 && subtipo.toUpperCase() == 'I') {
-      abrirTelaDominio();
+    // 111 - CANCELAMENTO DE CUPOM
+    if (codigo == 111 && subtipo.toUpperCase() == 'I') {
+      abrirTelaCancelamento();
+      return;
     }
 
-    print(
-      'TELA RECEBEU FUNÇÃO: '
-      '$subtipo|$codigo',
-    );
+    // 198 - DOMÍNIO
+    if (codigo == 198 && subtipo.toUpperCase() == 'I') {
+      abrirTelaDominio();
+      return;
+    }
+
+    print('TELA RECEBEU FUNÇÃO: $subtipo|$codigo');
   }
 
   // ============================================================
