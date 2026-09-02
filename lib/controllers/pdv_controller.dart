@@ -67,7 +67,7 @@ class PdvController extends GetxController {
   // ============================================================
   // INICIALIZAÇÃO
   // ============================================================
-  static const String _hostPdv = '127.0.0.1';
+  static const String _hostPdv = '192.168.0.103';
 
   static const int _portaPdv = 8082;
   @override
@@ -559,6 +559,22 @@ class PdvController extends GetxController {
     print('>>> FUNÇÃO: $comando');
 
     await socketService.enviar(comando);
+  }
+
+  // ============================================================
+  // ENVIO DE TECLA
+  // ============================================================
+
+  Future<void> enviarTecla(String tecla) async {
+    if (!conectado.value) {
+      print('TECLA NÃO ENVIADA - PDV DESCONECTADO: $tecla');
+      return;
+    }
+
+    print('>>> TECLA: $tecla');
+
+    // Aqui entra o formato EXATO esperado pelo PDV.
+    await socketService.enviar(tecla);
   }
 
   // ============================================================
