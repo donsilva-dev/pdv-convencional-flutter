@@ -28,7 +28,8 @@ class HomeScreen extends StatelessWidget {
           return const Center(child: Text('Aguardando PDV...'));
         }
 
-        final caminho = '${PdvPaths.pictures}\\$nomeImagem';
+        final caminho = PdvPaths.imagem(nomeImagem);
+
         final arquivo = File(caminho);
 
         return Stack(
@@ -39,46 +40,35 @@ class HomeScreen extends StatelessWidget {
             Positioned.fill(
               child: arquivo.existsSync()
                   ? Image.file(arquivo, fit: BoxFit.fill)
-                  : Center(
-                      child: Text(
-                        'Imagem não encontrada:\n'
-                        '$caminho',
-                      ),
-                    ),
+                  : Center(child: Text('Imagem não encontrada:\n$caminho')),
             ),
 
             // ==================================================
             // VENDA
-            //
-            // Durante cancelamento, escondemos SOMENTE
-            // os dados da venda.
+            // Durante cancelamento escondemos somente os dados
+            // da venda.
             // ==================================================
             if (!controller.telaCancelamentoAtiva.value)
               const PdvVendaOverlay(),
 
             // ==================================================
             // RECEBIMENTO
-            // status == 4
             // ==================================================
             if (!controller.telaCancelamentoAtiva.value)
               const PdvRecebimentoOverlay(),
 
             // ==================================================
             // CONSULTA
-            // status == 13
             // ==================================================
             const PdvConsultaOverlay(),
 
             // ==================================================
             // INTERFACE DINÂMICA
-            // função 198
             // ==================================================
             const PdvInterfaceOverlay(),
 
             // ==================================================
             // DISPLAY INFERIOR
-            //
-            // CONTINUA APARECENDO NO CANCELAMENTO
             // ==================================================
             const Positioned(
               left: 0,

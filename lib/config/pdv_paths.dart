@@ -1,11 +1,3 @@
-// class PdvPaths {
-//   static const String root = r'D:\vmix\vmix';
-
-//   static const String parametros = r'D:\vmix\vmix\param\parametros_pdv.xml';
-
-//   static const String pictures = r'D:\vmix\vmix\pictures';
-// }
-
 import 'dart:io';
 
 class PdvPaths {
@@ -31,5 +23,9 @@ class PdvPaths {
     }
 
     return '/vmix/vmix/pictures';
+  }
+
+  static String imagem(String nomeArquivo) {
+    return '$pictures${Platform.pathSeparator}$nomeArquivo';
   }
 }

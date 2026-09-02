@@ -2,6 +2,7 @@ import 'package:device_preview/device_preview.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:pdv_convencional/screens/cancelamento_cupom.dart';
 
 import 'bindings/pdv_binding.dart';
 import 'models/pdv_config.dart';
