@@ -67,7 +67,7 @@ class PdvController extends GetxController {
   // ============================================================
   // INICIALIZAÇÃO
   // ============================================================
-  static const String _hostPdv = '172.16.115.110';
+  static const String _hostPdv = '127.0.0.1';
 
   static const int _portaPdv = 8082;
   @override
