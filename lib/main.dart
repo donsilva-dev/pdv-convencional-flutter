@@ -1,9 +1,11 @@
+import 'dart:io';
+
 import 'package:device_preview/device_preview.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pdv_convencional/screens/cancelamento_cupom.dart';
-
+import 'package:window_manager/window_manager.dart';
 import 'bindings/pdv_binding.dart';
 import 'models/pdv_config.dart';
 import 'screens/home_screen.dart';
@@ -11,6 +13,27 @@ import 'services/pdv_config_service.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // ============================================================
+  // FULLSCREEN - WINDOWS / LINUX
+  // ============================================================
+
+  if (Platform.isWindows || Platform.isLinux) {
+    await windowManager.ensureInitialized();
+
+    const windowOptions = WindowOptions(
+      fullScreen: true,
+      center: true,
+      backgroundColor: Colors.black,
+      titleBarStyle: TitleBarStyle.hidden,
+    );
+
+    await windowManager.waitUntilReadyToShow(windowOptions, () async {
+      await windowManager.setFullScreen(true);
+      await windowManager.show();
+      await windowManager.focus();
+    });
+  }
 
   final configService = PdvConfigService();
 
