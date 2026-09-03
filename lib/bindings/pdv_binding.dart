@@ -9,9 +9,11 @@ import '../services/pdv_socket_service.dart';
 
 class PdvBinding extends Bindings {
   final PdvConfig config;
+  final int componente;
 
   PdvBinding({
     required this.config,
+    required this.componente,
   });
 
   @override
@@ -38,6 +40,7 @@ class PdvBinding extends Bindings {
     Get.put<PdvTelaController>(
       PdvTelaController(
         config.parametros,
+        componente: componente,
       ),
       permanent: true,
     );

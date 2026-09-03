@@ -12,7 +12,9 @@ class PdvTelaController extends GetxController {
 
   late final PdvRendererService renderer;
 
-  PdvTelaController(this.parametros);
+  final int componente;
+
+  PdvTelaController(this.parametros, {required this.componente});
 
   // ============================================================
   // ESTADO / IMAGEM
@@ -145,6 +147,13 @@ class PdvTelaController extends GetxController {
     super.onInit();
 
     renderer = PdvRendererService(parametros);
+
+    // Define o componente antes de qualquer busca no XML.
+    renderer.definirComponente(componente);
+
+    print('======================================');
+    print('PDV TELA - COMPONENTE ATIVO: $componente');
+    print('======================================');
 
     _carregarTelaInicial();
     _carregarLabelsVenda();
@@ -450,7 +459,27 @@ class PdvTelaController extends GetxController {
   // ============================================================
 
   void atualizarStatus(int novoStatus) {
+    final statusAnterior = status.value;
+
     status.value = novoStatus;
+
+    // ==================================================
+    // NOVA VENDA
+    // ==================================================
+    //
+    // Quando sai de DISPONÍVEL (2) e entra em VENDA (3),
+    // significa que uma nova venda foi iniciada.
+    //
+    // Limpamos os dados da venda anterior para não
+    // reaproveitar informações antigas na tela.
+    // ==================================================
+    if (statusAnterior == 2 && novoStatus == 3) {
+      limparVenda();
+
+      print('======= NOVA VENDA =======');
+      print('VENDA ANTERIOR LIMPA');
+      print('==========================');
+    }
 
     // ==================================================
     // CANCELAMENTO
@@ -505,7 +534,8 @@ class PdvTelaController extends GetxController {
     // ==================================================
     barraDisplayVisivel.value = true;
 
-    print('STATUS: $novoStatus');
+    print('STATUS ANTERIOR: $statusAnterior');
+    print('STATUS ATUAL: $novoStatus');
     print('IMAGEM: ${imagem.value}');
   }
 
