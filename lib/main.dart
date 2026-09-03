@@ -19,22 +19,22 @@ Future<void> main() async {
   // FULLSCREEN - WINDOWS / LINUX
   // ============================================================
 
-  // if (Platform.isWindows || Platform.isLinux) {
-  //   await windowManager.ensureInitialized();
+  if (Platform.isWindows || Platform.isLinux) {
+    await windowManager.ensureInitialized();
 
-  //   const windowOptions = WindowOptions(
-  //     fullScreen: false,
-  //     center: true,
-  //     backgroundColor: Colors.black,
-  //     titleBarStyle: TitleBarStyle.hidden,
-  //   );
+    const windowOptions = WindowOptions(
+      fullScreen: false,
+      center: true,
+      backgroundColor: Colors.black,
+      titleBarStyle: TitleBarStyle.hidden,
+    );
 
-  //   await windowManager.waitUntilReadyToShow(windowOptions, () async {
-  //     await windowManager.setFullScreen(false);
-  //     await windowManager.show();
-  //     await windowManager.focus();
-  //   });
-  // }
+    await windowManager.waitUntilReadyToShow(windowOptions, () async {
+      await windowManager.setFullScreen(false);
+      await windowManager.show();
+      await windowManager.focus();
+    });
+  }
 
   // ============================================================
   // PARÂMETROS DO PDV
