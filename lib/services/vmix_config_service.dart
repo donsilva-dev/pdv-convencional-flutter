@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 
 import '../config/pdv_paths.dart';
@@ -8,12 +9,24 @@ class VmixConfigService {
       final arquivo = File(PdvPaths.vmixConfig);
 
       if (!arquivo.existsSync()) {
-        print('VMIX.CFG NÃO ENCONTRADO: ${PdvPaths.vmixConfig}');
+        print('VMIX.CFG NAO ENCONTRADO: ${PdvPaths.vmixConfig}');
         print('COMPONENTE UTILIZADO: 0');
         return 0;
       }
 
-      final linhas = arquivo.readAsLinesSync();
+      // ============================================================
+      // LEITURA DO VMIX.CFG
+      // ============================================================
+      //
+      // O vmix.cfg pode ter sido gerado em ANSI / ISO-8859-1.
+      // Por isso não usamos readAsLinesSync(), que espera UTF-8.
+      // ============================================================
+
+      final bytes = arquivo.readAsBytesSync();
+
+      final conteudo = latin1.decode(bytes, allowInvalid: true);
+
+      final linhas = const LineSplitter().convert(conteudo);
 
       int? grupo;
       int? numeroComponente;
@@ -35,46 +48,55 @@ class VmixConfigService {
           continue;
         }
 
-        final chave = linha
-            .substring(0, indiceIgual)
-            .trim()
-            .toUpperCase();
+        final chave = linha.substring(0, indiceIgual).trim().toUpperCase();
 
-        final valor = linha
-            .substring(indiceIgual + 1)
-            .trim();
-
-        final numero = int.tryParse(valor);
-
-        if (numero == null) {
-          continue;
-        }
+        final valor = linha.substring(indiceIgual + 1).trim();
 
         if (chave == 'GRUPO') {
-          grupo = numero;
+          final numero = int.tryParse(valor);
+
+          if (numero != null) {
+            grupo = numero;
+          }
         }
 
         if (chave == 'NUMEROCOMPONENTE') {
-          numeroComponente = numero;
+          final numero = int.tryParse(valor);
+
+          if (numero != null) {
+            numeroComponente = numero;
+          }
         }
       }
 
-      // GRUPO tem prioridade.
+      // ============================================================
+      // PRIORIDADE 1 - GRUPO
+      // ============================================================
+
       if (grupo != null) {
         print('GRUPO ENCONTRADO: $grupo');
         print('COMPONENTE UTILIZADO: $grupo');
+
         return grupo;
       }
 
-      // Sem GRUPO, usa NUMEROCOMPONENTE.
+      // ============================================================
+      // PRIORIDADE 2 - NUMEROCOMPONENTE
+      // ============================================================
+
       if (numeroComponente != null) {
         print('NUMEROCOMPONENTE ENCONTRADO: $numeroComponente');
+
         print('COMPONENTE UTILIZADO: $numeroComponente');
+
         return numeroComponente;
       }
 
-      // Sem nenhum dos dois.
-      print('GRUPO E NUMEROCOMPONENTE NÃO DEFINIDOS');
+      // ============================================================
+      // PADRAO
+      // ============================================================
+
+      print('GRUPO E NUMEROCOMPONENTE NAO DEFINIDOS');
       print('COMPONENTE UTILIZADO: 0');
 
       return 0;
