@@ -10,9 +10,7 @@ class PdvConfigService {
     final file = File(PdvPaths.parametros);
 
     if (!await file.exists()) {
-      throw Exception(
-        'XML não encontrado em: ${PdvPaths.parametros}',
-      );
+      throw Exception('XML não encontrado em: ${PdvPaths.parametros}');
     }
 
     return await file.readAsString();
@@ -27,9 +25,7 @@ class PdvConfigService {
   Future<PdvConfig> carregarConfig() async {
     final parametros = await carregarParametros();
 
-    return PdvConfig(
-      parametros: parametros,
-    );
+    return PdvConfig(parametros: parametros);
   }
 
   List<PdvParametro> _parseXml(String xml) {
@@ -37,19 +33,15 @@ class PdvConfigService {
 
     final regex = RegExp(
       r'<ROW\s+'
-      r'componente="([^"]*)"\s+'
-      r'id="([^"]*)"\s+'
+      r'componente="([^"]*)"\s*'
+      r'id="([^"]*)"\s*'
       r'parametro="([^"]*)"\s*/>',
     );
 
     for (final match in regex.allMatches(xml)) {
-      final componente = int.tryParse(
-        match.group(1) ?? '',
-      );
+      final componente = int.tryParse(match.group(1) ?? '');
 
-      final id = double.tryParse(
-        match.group(2) ?? '',
-      );
+      final id = double.tryParse(match.group(2) ?? '');
 
       final parametro = match.group(3) ?? '';
 
@@ -58,13 +50,11 @@ class PdvConfigService {
       }
 
       parametros.add(
-        PdvParametro(
-          componente: componente,
-          id: id,
-          parametro: parametro,
-        ),
+        PdvParametro(componente: componente, id: id, parametro: parametro),
       );
     }
+
+    print('TOTAL DE PARAMETROS CARREGADOS: ${parametros.length}');
 
     return parametros;
   }
