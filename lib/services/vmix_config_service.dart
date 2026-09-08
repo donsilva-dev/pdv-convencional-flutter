@@ -73,7 +73,7 @@ class VmixConfigService {
       // PRIORIDADE 1 - GRUPO
       // ============================================================
 
-      if (grupo != null) {
+      if (grupo != null && grupo > 0) {
         print('GRUPO ENCONTRADO: $grupo');
         print('COMPONENTE UTILIZADO: $grupo');
 
@@ -84,7 +84,7 @@ class VmixConfigService {
       // PRIORIDADE 2 - NUMEROCOMPONENTE
       // ============================================================
 
-      if (numeroComponente != null) {
+      if (numeroComponente != null && numeroComponente > 0) {
         print('NUMEROCOMPONENTE ENCONTRADO: $numeroComponente');
 
         print('COMPONENTE UTILIZADO: $numeroComponente');
