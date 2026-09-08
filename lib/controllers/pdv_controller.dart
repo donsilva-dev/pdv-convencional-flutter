@@ -67,9 +67,7 @@ class PdvController extends GetxController {
   // ============================================================
   // INICIALIZAÇÃO
   // ============================================================
-  static const String _hostPdv = '192.168.15.19';
 
-  static const int _portaPdv = 8082;
   @override
   void onInit() {
     super.onInit();
@@ -102,10 +100,7 @@ class PdvController extends GetxController {
 
     conectando.value = true;
 
-    final sucesso = await socketService.conectar(
-      host: _hostPdv,
-      port: _portaPdv,
-    );
+    final sucesso = await socketService.conectar();
 
     conexaoInicializada.value = true;
     conectado.value = sucesso;
@@ -581,8 +576,8 @@ class PdvController extends GetxController {
   // CONEXÃO
   // ============================================================
 
-  Future<void> conectar({required String host, required int port}) async {
-    await socketService.conectar(host: host, port: port);
+  Future<void> conectar() async {
+    await socketService.conectar();
   }
 
   // ============================================================

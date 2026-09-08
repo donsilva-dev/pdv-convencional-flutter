@@ -36,4 +36,19 @@ class PdvPaths {
   static String imagem(String nomeArquivo) {
     return '$pictures${Platform.pathSeparator}$nomeArquivo';
   }
+
+  // Pasta onde o executável Flutter está rodando.
+  static String get bundle {
+    return File(Platform.resolvedExecutable).parent.path;
+  }
+
+  // /bundle/logs
+  static String get logs {
+    return '$bundle${Platform.pathSeparator}logs';
+  }
+
+  // /bundle/config.json
+  static String get config {
+    return '$bundle${Platform.pathSeparator}config.json';
+  }
 }
