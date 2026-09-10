@@ -59,7 +59,7 @@ class PdvAbrirGaveta extends StatelessWidget {
                       child: Lottie.file(
                         abrirGaveta,
                         fit: BoxFit.contain,
-                        frameRate: FrameRate.max,
+                        frameRate: FrameRate(30),
                       ),
                     ),
                 ],
