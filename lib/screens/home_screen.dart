@@ -180,6 +180,12 @@ class _HomeScreenState extends State<HomeScreen> {
                   const Positioned.fill(child: PdvAbrirGaveta()),
 
                 // ==================================================
+                // AGUARDANDO FECHAMENTO
+                // ==================================================
+                if (pdvController.aguardandoFechamento.value)
+                  const Positioned.fill(child: PdvAguardandoFechamento()),
+
+                // ==================================================
                 // DISPLAY INFERIOR
                 // ==================================================
                 const Positioned(
@@ -195,18 +201,6 @@ class _HomeScreenState extends State<HomeScreen> {
                   bottom: 0,
                   child: PdvFooter(),
                 ),
-
-                // ==================================================
-                // ABRIR GAVETA
-                // ==================================================
-                if (telaController.telaAbrirGavetaAtiva.value)
-                  const Positioned.fill(child: PdvAbrirGaveta()),
-
-                // ==================================================
-                // AGUARDANDO FECHAMENTO
-                // ==================================================
-                if (pdvController.aguardandoFechamento.value)
-                  const Positioned.fill(child: PdvAguardandoFechamento()),
 
                 // ==================================================
                 // CONEXÃO - SEMPRE POR ÚLTIMO

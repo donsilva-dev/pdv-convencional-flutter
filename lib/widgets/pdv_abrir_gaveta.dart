@@ -54,7 +54,14 @@ class PdvAbrirGaveta extends StatelessWidget {
                   const SizedBox(height: 30),
 
                   if (abrirGaveta.existsSync())
-                    SizedBox(height: 400, child: Lottie.file(abrirGaveta)),
+                    SizedBox(
+                      height: 280,
+                      child: Lottie.file(
+                        abrirGaveta,
+                        fit: BoxFit.contain,
+                        frameRate: FrameRate.max,
+                      ),
+                    ),
                 ],
               ),
             ),

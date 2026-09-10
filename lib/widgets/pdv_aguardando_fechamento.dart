@@ -46,7 +46,14 @@ class PdvAguardandoFechamento extends StatelessWidget {
                 ),
                 const SizedBox(height: 30),
                 if (clock.existsSync())
-                  SizedBox(height: 300, child: LottieBuilder.file(clock)),
+                  SizedBox(
+                    height: 280,
+                    child: Lottie.file(
+                      clock,
+                      fit: BoxFit.contain,
+                      frameRate: FrameRate.max,
+                    ),
+                  ),
                 const SizedBox(height: 30),
                 Text(
                   'Terminal temporariamente indisponível',
