@@ -1,4 +1,5 @@
 import 'package:get/get.dart';
+import 'package:pdv_convencional/widgets/pdv_abrir_gaveta.dart';
 
 import '../models/pdv_label_config.dart';
 import '../models/pdv_parametro.dart';
@@ -33,6 +34,10 @@ class PdvTelaController extends GetxController {
   final RxBool barraDisplayVisivel = true.obs;
   final RxBool displayCentralizado = false.obs;
 
+  // ============================================================
+  // ABRIR GAVETA
+  // ============================================================
+  final RxBool telaAbrirGavetaAtiva = false.obs;
   // ============================================================
   // FUNÇÃO
   // ============================================================
@@ -158,6 +163,16 @@ class PdvTelaController extends GetxController {
     _carregarTelaInicial();
     _carregarLabelsVenda();
     _carregarLabelsRecebimento();
+  }
+
+  // ABRIR GAVETA
+  void abrirTelaGaveta() {
+    telaAbrirGavetaAtiva.value = true;
+  }
+
+  // FECHAR GAVETA
+  void fechaTelaGaveta() {
+    telaAbrirGavetaAtiva.value = false;
   }
 
   // ============================================================
@@ -530,6 +545,12 @@ class PdvTelaController extends GetxController {
     }
 
     // ==================================================
+    // ABRIR GAVETA
+    // ==================================================
+    if (novoStatus == 2) {
+      fechaTelaGaveta();
+    }
+    // ==================================================
     // DISPLAY
     // ==================================================
     barraDisplayVisivel.value = true;
@@ -690,6 +711,12 @@ class PdvTelaController extends GetxController {
     // 198 - DOMÍNIO
     if (codigo == 198 && subtipo.toUpperCase() == 'I') {
       abrirTelaDominio();
+      return;
+    }
+
+    // 114 - ABRIR GAVETA
+    if (codigo == 114 && subtipo.toUpperCase() == 'I') {
+      abrirTelaGaveta();
       return;
     }
 

@@ -17,6 +17,14 @@ class PdvPaths {
     return '/vmix/vmix/dataisp/linux/param/parametros_pdv.xml';
   }
 
+  static String get lottie {
+    if (Platform.isWindows) {
+      return r'D:\vmix\vmix\pictures\data\lottie';
+    }
+
+    return '/vmix/vmix/pictures/data/lottie';
+  }
+
   static String get pictures {
     if (Platform.isWindows) {
       return r'D:\vmix\vmix\pictures';
@@ -49,6 +57,10 @@ class PdvPaths {
 
   // /bundle/config.json
   static String get config {
+    if (Platform.isWindows) {
+      return r'D:\vmix\vmix\config.json';
+    }
+
     return '$bundle${Platform.pathSeparator}config.json';
   }
 }

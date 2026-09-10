@@ -25,6 +25,9 @@ class PdvController extends GetxController {
 
   final RxInt tentativaReconexao = 0.obs;
 
+  // AGUARDANDO FECHAMENTO
+  final RxBool aguardandoFechamento = false.obs;
+
   // ============================================================
   // ESTADO DO PDV
   // ============================================================
@@ -84,6 +87,53 @@ class PdvController extends GetxController {
     super.onReady();
 
     _conectarPdv();
+  }
+
+  // COMPARAR DATA DO PDV
+  void verificarDataOperacional(String dataPdv) {
+    try {
+      if (dataPdv.trim().isEmpty) {
+        return;
+      }
+
+      final partes = dataPdv.trim().split('/');
+
+      if (partes.length != 3) {
+        return;
+      }
+
+      final dia = int.tryParse(partes[0]);
+      final mes = int.tryParse(partes[1]);
+      final ano = int.tryParse(partes[2]);
+
+      if (dia == null || mes == null || ano == null) {
+        return;
+      }
+
+      final dataOperacional = DateTime(2000 + ano, mes, dia);
+
+      final agora = DateTime.now();
+
+      final dataAtual = DateTime(agora.year, agora.month, agora.day);
+
+      aguardandoFechamento.value = dataOperacional.isBefore(dataAtual);
+
+      print('======================================');
+      print('DATA PDV: $dataPdv');
+      print(
+        'DATA ATUAL: '
+        '${dataAtual.day.toString().padLeft(2, '0')}/'
+        '${dataAtual.month.toString().padLeft(2, '0')}/'
+        '${dataAtual.year}',
+      );
+      print(
+        'AGUARDANDO FECHAMENTO: '
+        '${aguardandoFechamento.value}',
+      );
+      print('======================================');
+    } catch (e) {
+      print('ERRO AO VERIFICAR DATA OPERACIONAL: $e');
+    }
   }
 
   Future<void> _conectarPdv() async {
@@ -486,6 +536,21 @@ class PdvController extends GetxController {
 
     // Preservamos exatamente o RAW para o footer.
     sistemaRaw.value = mensagem.raw;
+
+    // ==========================================================
+    // DATA OPERACIONAL DO PDV
+    // ==========================================================
+
+    final matchData = RegExp(
+      r'Data:(\d{2}/\d{2}/\d{2})',
+      caseSensitive: false,
+    ).firstMatch(mensagem.raw);
+
+    if (matchData != null) {
+      final dataPdv = matchData.group(1) ?? '';
+
+      verificarDataOperacional(dataPdv);
+    }
 
     // ==========================================================
     // SERVIDOR
