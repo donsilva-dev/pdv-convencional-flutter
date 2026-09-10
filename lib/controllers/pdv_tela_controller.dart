@@ -168,11 +168,23 @@ class PdvTelaController extends GetxController {
   // ABRIR GAVETA
   void abrirTelaGaveta() {
     telaAbrirGavetaAtiva.value = true;
+
+    print('======================================');
+    print('TELA ABRIR GAVETA ATIVADA');
+    print(
+      'telaAbrirGavetaAtiva: '
+      '${telaAbrirGavetaAtiva.value}',
+    );
+    print('======================================');
   }
 
   // FECHAR GAVETA
   void fechaTelaGaveta() {
     telaAbrirGavetaAtiva.value = false;
+
+    print('======================================');
+    print('TELA ABRIR GAVETA FECHADA');
+    print('======================================');
   }
 
   // ============================================================

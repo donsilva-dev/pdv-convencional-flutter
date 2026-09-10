@@ -189,9 +189,6 @@ class _HomeScreenState extends State<HomeScreen> {
                   child: PdvDisplayBar(),
                 ),
 
-                // ==================================================
-                // FOOTER
-                // ==================================================
                 const Positioned(
                   left: 0,
                   right: 0,
@@ -200,15 +197,19 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
 
                 // ==================================================
+                // ABRIR GAVETA
+                // ==================================================
+                if (telaController.telaAbrirGavetaAtiva.value)
+                  const Positioned.fill(child: PdvAbrirGaveta()),
+
+                // ==================================================
                 // AGUARDANDO FECHAMENTO
                 // ==================================================
                 if (pdvController.aguardandoFechamento.value)
                   const Positioned.fill(child: PdvAguardandoFechamento()),
 
                 // ==================================================
-                // CONEXÃO
-                //
-                // SEMPRE POR ÚLTIMO
+                // CONEXÃO - SEMPRE POR ÚLTIMO
                 // ==================================================
                 const Positioned.fill(child: PdvConexaoOverlay()),
               ],
