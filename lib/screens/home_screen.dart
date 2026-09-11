@@ -7,6 +7,7 @@ import 'package:get/get.dart';
 import 'package:pdv_convencional/controllers/pdv_controller.dart';
 import 'package:pdv_convencional/widgets/pdv_abrir_gaveta.dart';
 import 'package:pdv_convencional/widgets/pdv_aguardando_fechamento.dart';
+import 'package:pdv_convencional/widgets/pdv_carga.dart';
 import 'package:pdv_convencional/widgets/pdv_conexao_overlay.dart';
 import 'package:pdv_convencional/widgets/pdv_consulta_overlay.dart';
 import 'package:pdv_convencional/widgets/pdv_recebimento_overlay.dart';
@@ -179,6 +180,11 @@ class _HomeScreenState extends State<HomeScreen> {
                 if (telaController.telaAbrirGavetaAtiva.value)
                   const Positioned.fill(child: PdvAbrirGaveta()),
 
+                // ==================================================
+                // RECEBE CARGA
+                // ==================================================
+                if (telaController.telaCarga.value)
+                  const Positioned.fill(child: PdvCarga()),
                 // ==================================================
                 // AGUARDANDO FECHAMENTO
                 // ==================================================

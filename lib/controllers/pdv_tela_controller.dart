@@ -1,6 +1,4 @@
 import 'package:get/get.dart';
-import 'package:pdv_convencional/widgets/pdv_abrir_gaveta.dart';
-
 import '../models/pdv_label_config.dart';
 import '../models/pdv_parametro.dart';
 import '../services/pdv_label_parser.dart';
@@ -38,6 +36,12 @@ class PdvTelaController extends GetxController {
   // ABRIR GAVETA
   // ============================================================
   final RxBool telaAbrirGavetaAtiva = false.obs;
+
+  // ============================================================
+  // CARGA
+  // ============================================================
+  final RxBool telaCarga = false.obs;
+
   // ============================================================
   // FUNÇÃO
   // ============================================================
@@ -184,6 +188,28 @@ class PdvTelaController extends GetxController {
 
     print('======================================');
     print('TELA ABRIR GAVETA FECHADA');
+    print('======================================');
+  }
+
+  // RECEBENDO CARGA
+  void recebeCarga() {
+    telaCarga.value = true;
+
+    print('======================================');
+    print('TELA RECEBENDO CARGA ATIVADA');
+    print(
+      'telaCarga: '
+      '${telaCarga.value}',
+    );
+    print('======================================');
+  }
+
+  // FINALIZANDO CARGA
+  void finalizandoCarga() {
+    telaCarga.value = false;
+
+    print('======================================');
+    print('TELA CARGA FINALIZADA');
     print('======================================');
   }
 
@@ -557,10 +583,17 @@ class PdvTelaController extends GetxController {
     }
 
     // ==================================================
-    // ABRIR GAVETA
+    // FECHA GAVETA
     // ==================================================
     if (novoStatus == 2) {
       fechaTelaGaveta();
+    }
+
+    // ==================================================
+    // FINALIZA CARGA
+    // ==================================================
+    if (novoStatus == 2) {
+      finalizandoCarga();
     }
     // ==================================================
     // DISPLAY
@@ -732,8 +765,18 @@ class PdvTelaController extends GetxController {
       return;
     }
 
+    if (codigo == 122 && subtipo.toUpperCase() == 'I' ||
+        codigo == 168 && subtipo.toUpperCase() == 'I') {
+      recebeCarga();
+      return;
+    }
+
     print('TELA RECEBEU FUNÇÃO: $subtipo|$codigo');
   }
+
+  // ============================================================
+  // FUNÇÃO 165 | 122
+  // ============================================================
 
   // ============================================================
   // FUNÇÃO 198

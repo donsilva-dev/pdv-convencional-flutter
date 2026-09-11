@@ -5,10 +5,8 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pdv_convencional/screens/home_screen.dart';
-import 'package:pdv_convencional/widgets/pdv_abrir_gaveta.dart';
-import 'package:pdv_convencional/widgets/pdv_aguardando_fechamento.dart';
+import 'package:pdv_convencional/widgets/pdv_carga.dart';
 import 'package:window_manager/window_manager.dart';
-
 import 'bindings/pdv_binding.dart';
 import 'models/app_config.dart';
 import 'models/pdv_config.dart';
