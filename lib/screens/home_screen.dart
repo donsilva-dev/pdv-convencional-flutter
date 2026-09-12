@@ -10,10 +10,12 @@ import 'package:pdv_convencional/widgets/pdv_aguardando_fechamento.dart';
 import 'package:pdv_convencional/widgets/pdv_carga.dart';
 import 'package:pdv_convencional/widgets/pdv_conexao_overlay.dart';
 import 'package:pdv_convencional/widgets/pdv_consulta_overlay.dart';
+import 'package:pdv_convencional/widgets/pdv_imp_de_leitura_x.dart';
 import 'package:pdv_convencional/widgets/pdv_recebimento_overlay.dart';
 import 'package:pdv_convencional/widgets/pdv_display.dart';
 import 'package:pdv_convencional/widgets/pdv_footer.dart';
 import 'package:pdv_convencional/widgets/pdv_interface_overlay.dart';
+import 'package:pdv_convencional/widgets/pdv_sandria.dart';
 import 'package:pdv_convencional/widgets/pdv_venda_overlay.dart';
 
 import '../config/pdv_paths.dart';
@@ -185,12 +187,24 @@ class _HomeScreenState extends State<HomeScreen> {
                 // ==================================================
                 if (telaController.telaCarga.value)
                   const Positioned.fill(child: PdvCarga()),
+
                 // ==================================================
                 // AGUARDANDO FECHAMENTO
                 // ==================================================
                 if (pdvController.aguardandoFechamento.value)
                   const Positioned.fill(child: PdvAguardandoFechamento()),
 
+                // ==================================================
+                // TELA SANGRIA
+                // ==================================================
+                if (telaController.telaSangria.value)
+                  const Positioned.fill(child: PdvSandria()),
+
+                // ==================================================
+                // TELA LEITURA X
+                // ==================================================
+                if (telaController.telaLeituraX.value)
+                  const Positioned.fill(child: PdvImpDeLeituraX()),
                 // ==================================================
                 // DISPLAY INFERIOR
                 // ==================================================

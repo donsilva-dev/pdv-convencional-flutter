@@ -6,6 +6,8 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pdv_convencional/screens/home_screen.dart';
 import 'package:pdv_convencional/widgets/pdv_carga.dart';
+import 'package:pdv_convencional/widgets/pdv_imp_de_leitura_x.dart';
+import 'package:pdv_convencional/widgets/pdv_sandria.dart';
 import 'package:window_manager/window_manager.dart';
 import 'bindings/pdv_binding.dart';
 import 'models/app_config.dart';

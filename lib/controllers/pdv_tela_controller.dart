@@ -37,10 +37,23 @@ class PdvTelaController extends GetxController {
   // ============================================================
   final RxBool telaAbrirGavetaAtiva = false.obs;
 
+  int? _statusAntesGaveta;
+
   // ============================================================
   // CARGA
   // ============================================================
   final RxBool telaCarga = false.obs;
+
+  // ============================================================
+  // SANFRIA
+  // ============================================================
+  final RxBool telaSangria = false.obs;
+  int? _statusAntesSangria;
+
+  // ============================================================
+  // SANFRIA
+  // ============================================================
+  final RxBool telaLeituraX = false.obs;
 
   // ============================================================
   // FUNÇÃO
@@ -171,6 +184,7 @@ class PdvTelaController extends GetxController {
 
   // ABRIR GAVETA
   void abrirTelaGaveta() {
+    _statusAntesGaveta = status.value;
     telaAbrirGavetaAtiva.value = true;
 
     print('======================================');
@@ -185,6 +199,7 @@ class PdvTelaController extends GetxController {
   // FECHAR GAVETA
   void fechaTelaGaveta() {
     telaAbrirGavetaAtiva.value = false;
+    _statusAntesGaveta = null;
 
     print('======================================');
     print('TELA ABRIR GAVETA FECHADA');
@@ -210,6 +225,49 @@ class PdvTelaController extends GetxController {
 
     print('======================================');
     print('TELA CARGA FINALIZADA');
+    print('======================================');
+  }
+
+  // ABRIR TELA SANGRIA
+  void abrirTelaSangria() {
+    _statusAntesSangria = status.value;
+    telaSangria.value = true;
+
+    print('======================================');
+    print('TELA sSANGRIA ATIVADA');
+    print(
+      'telaSangria: '
+      '${telaSangria.value}',
+    );
+    print('======================================');
+  }
+
+  // FECHA TELA SANGRIA
+  void fechaTelaSangria() {
+    telaSangria.value = false;
+    _statusAntesSangria = null;
+
+    print('======================================');
+    print('TELA SANGRIA FINALIZADA');
+    print('======================================');
+  }
+
+  void abrirTelaLeituraX() {
+    telaLeituraX.value = true;
+    print('======================================');
+    print('TELA LEITURA X ATIVADA');
+    print(
+      'telaLeiturax: '
+      '${telaLeituraX.value}',
+    );
+    print('======================================');
+  }
+
+  void fechaTelaLeituraX() {
+    telaLeituraX.value = false;
+
+    print('======================================');
+    print('TELA LEITURA X FINALIZADA');
     print('======================================');
   }
 
@@ -277,11 +335,13 @@ class PdvTelaController extends GetxController {
   // ============================================================
 
   void abrirTelaConsulta() {
+    limparConsulta();
     telaConsultaAtiva.value = true;
   }
 
   void fecharTelaConsulta() {
     telaConsultaAtiva.value = false;
+    limparConsulta();
   }
 
   void limparConsulta() {
@@ -583,17 +643,40 @@ class PdvTelaController extends GetxController {
     }
 
     // ==================================================
-    // FECHA GAVETA
+    // FINALIZANDO CARGA
     // ==================================================
-    if (novoStatus == 2) {
-      fechaTelaGaveta();
+    if (statusAnterior == 10 && novoStatus != 10) {
+      finalizandoCarga();
     }
 
     // ==================================================
-    // FINALIZA CARGA
+    // FECHANDO TELA SANGRIA
     // ==================================================
-    if (novoStatus == 2) {
-      finalizandoCarga();
+    if (telaSangria.value &&
+        _statusAntesSangria != null &&
+        novoStatus == _statusAntesSangria) {
+      fechaTelaSangria();
+    }
+
+    // ==================================================
+    // FECHANDO TELA LEITURA X
+    // ==================================================
+    if (telaLeituraX.value &&
+        (novoStatus == 2 || novoStatus == 3 || novoStatus == 4)) {
+      fechaTelaLeituraX();
+    }
+
+    // if (telaAbrirGavetaAtiva.value && statusAnterior != novoStatus) {
+    //   fechaTelaGaveta();
+    // }
+
+    // ==================================================
+    // FECHA GAVETA
+    // ==================================================
+    if (telaAbrirGavetaAtiva.value &&
+        _statusAntesGaveta != null &&
+        novoStatus == _statusAntesGaveta) {
+      fechaTelaGaveta();
     }
     // ==================================================
     // DISPLAY
@@ -764,19 +847,26 @@ class PdvTelaController extends GetxController {
       abrirTelaGaveta();
       return;
     }
-
+    // 122 | 168 - CARGA
     if (codigo == 122 && subtipo.toUpperCase() == 'I' ||
         codigo == 168 && subtipo.toUpperCase() == 'I') {
       recebeCarga();
       return;
     }
+    // 110 - SANGRIA
+    if (codigo == 110 && subtipo.toUpperCase() == 'I') {
+      abrirTelaSangria();
+      return;
+    }
+
+    // 118 - LEITURA X
+    if (codigo == 118 && subtipo.toUpperCase() == 'I') {
+      abrirTelaLeituraX();
+      return;
+    }
 
     print('TELA RECEBEU FUNÇÃO: $subtipo|$codigo');
   }
-
-  // ============================================================
-  // FUNÇÃO 165 | 122
-  // ============================================================
 
   // ============================================================
   // FUNÇÃO 198

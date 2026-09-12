@@ -1,17 +1,7 @@
-import 'dart:ui';
-
 import 'package:flutter/material.dart';
 import 'package:pdv_convencional/models/pdv_label_config.dart';
 
 class PdvLabelParser {
-  static const double escalaX = 10.0;
-  static const double escalaY = 8.0;
-
-  static const double escalaWidth = 7.5;
-  static const double escalaHeight = 7.5;
-
-  static const double offsetY = 90.0;
-
   PdvLabelConfig? parse({required int id, required String parametro}) {
     if (parametro.trim().isEmpty) {
       return null;
@@ -26,30 +16,44 @@ class PdvLabelParser {
 
     return PdvLabelConfig(
       id: id,
+
+      // 1ª posição - cor da fonte
       corFonte: _parseCor(partes[0]),
+
+      // 2ª posição - visibilidade
       visivel: _parseBool(partes[1]),
 
-      left: _parseNumero(partes, 2) / escalaX,
-      top: (_parseNumero(partes, 3) / escalaY) - offsetY,
-      height: _parseNumero(partes, 4) / escalaHeight,
-      width: _parseNumero(partes, 5) / escalaWidth,
+      // 3ª posição - distância da esquerda
+      left: _parseNumero(partes, 2),
 
+      // 4ª posição - distância do topo
+      top: _parseNumero(partes, 3),
+
+      // 5ª posição - altura
+      height: _parseNumero(partes, 4),
+
+      // 6ª posição - largura
+      width: _parseNumero(partes, 5),
+
+      // 7ª posição - fonte
       fontFamily: _texto(partes, 6, 'Arial'),
 
+      // 8ª posição - tamanho da fonte
       fontSize: _parseNumero(partes, 7),
 
+      // 9ª posição - itálico
       italic: _parseBool(_parte(partes, 8)),
 
+      // 10ª posição - negrito
       bold: _parseBool(_parte(partes, 9)),
 
+      // 12ª posição - cor de fundo
       corFundo: partes.length > 11 ? _parseCorOpcional(partes[11]) : null,
 
+      // Campos adicionais existentes em alguns parâmetros
       redimensionamento: _parseInteiro(partes, 12),
-
       alinhamento: _parseInteiro(partes, 13),
-
       borda: _parseInteiro(partes, 14),
-
       conteudo: _parte(partes, 15),
     );
   }
@@ -65,7 +69,9 @@ class PdvLabelParser {
       return 0;
     }
 
-    return double.tryParse(partes[indice].trim()) ?? 0;
+    final valor = partes[indice].trim();
+
+    return double.tryParse(valor) ?? 0;
   }
 
   int _parseInteiro(List<String> partes, int indice) {
@@ -103,7 +109,9 @@ class PdvLabelParser {
   Color? _parseCorOpcional(String valor) {
     final texto = valor.trim();
 
-    if (texto.isEmpty || texto == 'N') {
+    if (texto.isEmpty ||
+        texto.toUpperCase() == 'N' ||
+        texto.toUpperCase() == 'NAO') {
       return null;
     }
 
@@ -118,9 +126,7 @@ class PdvLabelParser {
 
   Color _converterTColor(int valor) {
     final blue = (valor >> 16) & 0xFF;
-
     final green = (valor >> 8) & 0xFF;
-
     final red = valor & 0xFF;
 
     return Color.fromARGB(255, red, green, blue);

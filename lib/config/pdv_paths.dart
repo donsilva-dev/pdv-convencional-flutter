@@ -41,6 +41,13 @@ class PdvPaths {
     return '/vmix/vmix/vmix.cfg';
   }
 
+  static String get svg {
+    if (Platform.isWindows) {
+      return r'D:\vmix\vmix\pictures\data\assets\icons';
+    }
+    return '/vmix/vmix/pictures/data/assets/icons';
+  }
+
   static String imagem(String nomeArquivo) {
     return '$pictures${Platform.pathSeparator}$nomeArquivo';
   }

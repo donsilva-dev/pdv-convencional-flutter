@@ -7,6 +7,9 @@ import '../models/pdv_label_config.dart';
 class PdvVendaOverlay extends StatelessWidget {
   const PdvVendaOverlay({super.key});
 
+  static const double larguraBasePdv = 9000.0;
+  static const double alturaBasePdv = 7000.0;
+
   @override
   Widget build(BuildContext context) {
     final controller = Get.find<PdvTelaController>();
@@ -18,65 +21,82 @@ class PdvVendaOverlay extends StatelessWidget {
             return const SizedBox.shrink();
           }
 
-          return Stack(
-            fit: StackFit.expand,
-            children: [
-              // =============================================
-              // 1203 - CÓDIGO DO PRODUTO
-              // =============================================
-              _buildLabel(
-                config: controller.labelCodigoProduto.value,
-                texto: controller.codigoProdutoVendaFormatada,
-              ),
+          // =========================================================
+          // ESTADO REATIVO DA VENDA
+          // =========================================================
+          //
+          // Lemos explicitamente os Rx utilizados pela tela.
+          // Assim, qualquer I|02 recebido durante a venda
+          // provoca imediatamente a reconstrução do overlay.
+          // =========================================================
 
-              // =============================================
-              // 1204 - DESCRIÇÃO DO PRODUTO
-              // =============================================
-              _buildLabel(
-                config: controller.labelDescricaoProduto.value,
-                texto: controller.descricaoProdutoVenda.value,
-              ),
+          controller.codigoProdutoVenda.value;
+          controller.descricaoProdutoVenda.value;
+          controller.quantidadeVenda.value;
+          controller.valorUnitarioVenda.value;
+          controller.valorTotalVenda.value;
+          controller.subtotalVenda.value;
+          controller.itensVendidos.length;
 
-              // =============================================
-              // 1205 - QUANTIDADE
-              // =============================================
-              _buildLabel(
-                config: controller.labelQuantidade.value,
-                texto: controller.quantidadeVendaFormatada,
-              ),
+          return LayoutBuilder(
+            builder: (context, constraints) {
+              final larguraTela = constraints.maxWidth;
+              final alturaTela = constraints.maxHeight;
 
-              // =============================================
-              // 1206 - PREÇO UNITÁRIO
-              // =============================================
-              _buildLabel(
-                config: controller.labelPrecoUnitario.value,
-                texto: controller.valorUnitarioFormatado,
-              ),
+              return Stack(
+                fit: StackFit.expand,
+                children: [
+                  _buildLabel(
+                    config: controller.labelCodigoProduto.value,
+                    texto: controller.codigoProdutoVendaFormatada,
+                    larguraTela: larguraTela,
+                    alturaTela: alturaTela,
+                  ),
 
-              // =============================================
-              // 1207 - PREÇO TOTAL
-              // =============================================
-              _buildLabel(
-                config: controller.labelPrecoTotal.value,
-                texto: controller.valorTotalFormatado,
-              ),
+                  _buildLabel(
+                    config: controller.labelDescricaoProduto.value,
+                    texto: controller.descricaoProdutoVenda.value,
+                    larguraTela: larguraTela,
+                    alturaTela: alturaTela,
+                  ),
 
-              // =============================================
-              // 1208 - SUBTOTAL
-              // =============================================
-              _buildLabel(
-                config: controller.labelSubtotal.value,
-                texto: controller.subtotalFormatado,
-              ),
+                  _buildLabel(
+                    config: controller.labelQuantidade.value,
+                    texto: controller.quantidadeVendaFormatada,
+                    larguraTela: larguraTela,
+                    alturaTela: alturaTela,
+                  ),
 
-              // =============================================
-              // 1210 - ITENS VENDIDOS
-              // =============================================
-              _buildItensVendidos(
-                config: controller.labelItensVendidos.value,
-                itens: controller.itensVendidos,
-              ),
-            ],
+                  _buildLabel(
+                    config: controller.labelPrecoUnitario.value,
+                    texto: controller.valorUnitarioFormatado,
+                    larguraTela: larguraTela,
+                    alturaTela: alturaTela,
+                  ),
+
+                  _buildLabel(
+                    config: controller.labelPrecoTotal.value,
+                    texto: controller.valorTotalFormatado,
+                    larguraTela: larguraTela,
+                    alturaTela: alturaTela,
+                  ),
+
+                  _buildLabel(
+                    config: controller.labelSubtotal.value,
+                    texto: controller.subtotalFormatado,
+                    larguraTela: larguraTela,
+                    alturaTela: alturaTela,
+                  ),
+
+                  _buildItensVendidos(
+                    config: controller.labelItensVendidos.value,
+                    itens: controller.itensVendidos,
+                    larguraTela: larguraTela,
+                    alturaTela: alturaTela,
+                  ),
+                ],
+              );
+            },
           );
         }),
       ),
@@ -84,24 +104,45 @@ class PdvVendaOverlay extends StatelessWidget {
   }
 
   // =========================================================
-  // ITENS VENDIDOS - 1210
+  // ESCALA X
+  // =========================================================
+
+  double _scaleX(double larguraTela) {
+    return larguraTela / larguraBasePdv;
+  }
+
+  // =========================================================
+  // ESCALA Y
+  // =========================================================
+
+  double _scaleY(double alturaTela) {
+    return alturaTela / alturaBasePdv;
+  }
+
+  // =========================================================
+  // 1210 - ITENS VENDIDOS
   // =========================================================
 
   Widget _buildItensVendidos({
     required PdvLabelConfig? config,
     required List<String> itens,
+    required double larguraTela,
+    required double alturaTela,
   }) {
     if (config == null || !config.visivel || itens.isEmpty) {
       return const SizedBox.shrink();
     }
 
+    final scaleX = _scaleX(larguraTela);
+    final scaleY = _scaleY(alturaTela);
+
     final texto = itens.join('\n');
 
     return Positioned(
-      left: config.left,
-      top: config.top,
-      width: config.width,
-      height: config.height,
+      left: config.left * scaleX,
+      top: config.top * scaleY,
+      width: config.width * scaleX,
+      height: config.height * scaleY,
       child: ClipRect(
         child: Align(
           alignment: Alignment.topLeft,
@@ -112,9 +153,15 @@ class PdvVendaOverlay extends StatelessWidget {
             style: TextStyle(
               color: config.corFonte,
               fontFamily: _resolverFonte(config.fontFamily),
+
+              // IMPORTANTE:
+              // fontSize vem diretamente do XML.
               fontSize: config.fontSize,
+
               fontWeight: config.bold ? FontWeight.bold : FontWeight.normal,
+
               fontStyle: config.italic ? FontStyle.italic : FontStyle.normal,
+
               height: 1.2,
             ),
           ),
@@ -127,32 +174,46 @@ class PdvVendaOverlay extends StatelessWidget {
   // LABEL PADRÃO
   // =========================================================
 
-  Widget _buildLabel({required PdvLabelConfig? config, required String texto}) {
+  Widget _buildLabel({
+    required PdvLabelConfig? config,
+    required String texto,
+    required double larguraTela,
+    required double alturaTela,
+  }) {
     if (config == null || !config.visivel || texto.isEmpty) {
       return const SizedBox.shrink();
     }
 
+    final scaleX = _scaleX(larguraTela);
+    final scaleY = _scaleY(alturaTela);
+
     return Positioned(
-      left: config.left,
-      top: config.top,
-      width: config.width,
-      height: config.height,
-      child: Align(
-        alignment: _resolverAlinhamento(config.alinhamento),
-        child: Text(
-          texto,
-          maxLines: _maxLines(config),
-          softWrap: true,
-          overflow: config.redimensionamento == 1
-              ? TextOverflow.clip
-              : TextOverflow.visible,
-          style: TextStyle(
-            color: config.corFonte,
-            fontFamily: _resolverFonte(config.fontFamily),
-            fontSize: config.fontSize,
-            fontWeight: config.bold ? FontWeight.bold : FontWeight.normal,
-            fontStyle: config.italic ? FontStyle.italic : FontStyle.normal,
-            height: 1.1,
+      left: config.left * scaleX,
+      top: config.top * scaleY,
+      width: config.width * scaleX,
+      height: config.height * scaleY,
+      child: ClipRect(
+        child: Align(
+          alignment: _resolverAlinhamento(config.alinhamento),
+          child: Text(
+            texto,
+            maxLines: _maxLines(config),
+            softWrap: true,
+            overflow: TextOverflow.clip,
+            style: TextStyle(
+              color: config.corFonte,
+              fontFamily: _resolverFonte(config.fontFamily),
+
+              // IMPORTANTE:
+              // não escalamos o tamanho da fonte.
+              fontSize: config.fontSize,
+
+              fontWeight: config.bold ? FontWeight.bold : FontWeight.normal,
+
+              fontStyle: config.italic ? FontStyle.italic : FontStyle.normal,
+
+              height: 1.1,
+            ),
           ),
         ),
       ),
@@ -164,7 +225,6 @@ class PdvVendaOverlay extends StatelessWidget {
   // =========================================================
 
   int? _maxLines(PdvLabelConfig config) {
-    // Descrição pode ocupar mais de uma linha.
     if (config.id == 1204) {
       return null;
     }

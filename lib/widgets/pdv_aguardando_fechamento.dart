@@ -51,7 +51,7 @@ class PdvAguardandoFechamento extends StatelessWidget {
                     child: Lottie.file(
                       clock,
                       fit: BoxFit.contain,
-                      frameRate: FrameRate(30),
+                      frameRate: FrameRate(60),
                     ),
                   ),
                 const SizedBox(height: 30),
