@@ -1,4 +1,5 @@
 import 'package:get/get.dart';
+import 'package:pdv_convencional/controllers/pdv_descanso_controller.dart';
 import 'package:pdv_convencional/models/app_config.dart';
 import 'package:pdv_convencional/services/pdv_log_service.dart';
 
@@ -55,6 +56,13 @@ class PdvBinding extends Bindings {
         parser: Get.find<PdvMessageParser>(),
       ),
       permanent: true,
+    );
+    // VIDEO DESCANÇO
+    Get.put<PdvDescansoController>(
+      PdvDescansoController(
+        appConfig: appConfig,
+        telaController: Get.find<PdvTelaController>(),
+      ),
     );
   }
 }

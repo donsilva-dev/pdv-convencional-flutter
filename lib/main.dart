@@ -4,6 +4,7 @@ import 'package:device_preview/device_preview.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:media_kit/media_kit.dart';
 import 'package:pdv_convencional/screens/home_screen.dart';
 import 'package:pdv_convencional/widgets/pdv_carga.dart';
 import 'package:pdv_convencional/widgets/pdv_imp_de_leitura_x.dart';
@@ -49,6 +50,7 @@ Future<void> main() async {
 
   if (Platform.isWindows || Platform.isLinux) {
     await windowManager.ensureInitialized();
+    MediaKit.ensureInitialized();
 
     const windowOptions = WindowOptions(
       fullScreen: false,

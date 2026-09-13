@@ -70,4 +70,17 @@ class PdvPaths {
 
     return '$bundle${Platform.pathSeparator}config.json';
   }
+
+  // VIDEO
+  static String video(String nomeArquivo) {
+    return '$pictures${Platform.pathSeparator}$nomeArquivo';
+  }
+
+  // VIDEO - DESCANÇO
+  static String get chamaVideo {
+    if (Platform.isWindows) {
+      return r'D:\vmix\vmix\pictures';
+    }
+    return '/vmix/vmix/pictures';
+  }
 }
