@@ -62,6 +62,7 @@ class PdvBinding extends Bindings {
       PdvDescansoController(
         appConfig: appConfig,
         telaController: Get.find<PdvTelaController>(),
+        pdvController: Get.find<PdvController>(),
       ),
     );
   }

@@ -21,6 +21,7 @@ class PdvTelaController extends GetxController {
 
   final RxInt status = 0.obs;
   final RxString imagem = ''.obs;
+  //final RxBool aguardandoFechamento = false.obs;
 
   // ============================================================
   // DISPLAY INFERIOR
@@ -148,6 +149,16 @@ class PdvTelaController extends GetxController {
   // INICIALIZAÇÃO
   // ============================================================
   final RxBool telaCancelamentoAtiva = false.obs;
+
+  bool get temTelaOperacionalAtiva {
+    return telaAbrirGavetaAtiva.value ||
+        telaCarga.value ||
+        telaSangria.value ||
+        telaLeituraX.value ||
+        telaInterfaceAtiva.value ||
+        telaCancelamentoAtiva.value ||
+        telaConsultaAtiva.value;
+  }
 
   void abrirTelaCancelamento() {
     _cancelamentoEfetivado = false;

@@ -1,6 +1,6 @@
 import 'dart:async';
 import 'dart:io';
-
+import 'pdv_controller.dart';
 import 'package:get/get.dart';
 import 'package:pdv_convencional/config/pdv_paths.dart';
 
@@ -10,16 +10,34 @@ import 'pdv_tela_controller.dart';
 class PdvDescansoController extends GetxController {
   final AppConfig appConfig;
   final PdvTelaController telaController;
+  final PdvController pdvController;
 
   PdvDescansoController({
     required this.appConfig,
     required this.telaController,
+    required this.pdvController,
   });
 
   final RxBool telaDescansoAtiva = false.obs;
 
   Timer? _timer;
   Worker? _statusWorker;
+  Worker? _fechamentoWorker;
+
+  Worker? _gavetaWorker;
+  Worker? _cargaWorker;
+  Worker? _sangriaWorker;
+  Worker? _leituraXWorker;
+  Worker? _interfaceWorker;
+  Worker? _cancelamentoWorker;
+  Worker? _consultaWorker;
+
+  bool get podeExibirDescanso {
+    return habilitado &&
+        telaController.status.value == 2 &&
+        !pdvController.aguardandoFechamento.value &&
+        !telaController.temTelaOperacionalAtiva;
+  }
 
   bool get habilitado {
     return appConfig.possuiVideoDescanso;
@@ -35,6 +53,15 @@ class PdvDescansoController extends GetxController {
     return '${PdvPaths.chamaVideo}${Platform.pathSeparator}$nome';
   }
 
+  void _processarTelaOperacional() {
+    if (!podeExibirDescanso) {
+      cancelarDescanso();
+      return;
+    }
+
+    iniciarContagem();
+  }
+
   @override
   void onInit() {
     super.onInit();
@@ -47,7 +74,55 @@ class PdvDescansoController extends GetxController {
       _processarStatus(novoStatus);
     });
 
-    if (telaController.status.value == 2) {
+    _fechamentoWorker = ever<bool>(pdvController.aguardandoFechamento, (
+      aguardando,
+    ) {
+      if (aguardando) {
+        cancelarDescanso();
+        return;
+      }
+
+      if (telaController.status.value == 2) {
+        iniciarContagem();
+      }
+    });
+
+    _gavetaWorker = ever<bool>(
+      telaController.telaAbrirGavetaAtiva,
+      (_) => _processarTelaOperacional(),
+    );
+
+    _cargaWorker = ever<bool>(
+      telaController.telaCarga,
+      (_) => _processarTelaOperacional(),
+    );
+
+    _sangriaWorker = ever<bool>(
+      telaController.telaSangria,
+      (_) => _processarTelaOperacional(),
+    );
+
+    _leituraXWorker = ever<bool>(
+      telaController.telaLeituraX,
+      (_) => _processarTelaOperacional(),
+    );
+
+    _interfaceWorker = ever<bool>(
+      telaController.telaInterfaceAtiva,
+      (_) => _processarTelaOperacional(),
+    );
+
+    _cancelamentoWorker = ever<bool>(
+      telaController.telaCancelamentoAtiva,
+      (_) => _processarTelaOperacional(),
+    );
+
+    _consultaWorker = ever<bool>(
+      telaController.telaConsultaAtiva,
+      (_) => _processarTelaOperacional(),
+    );
+
+    if (podeExibirDescanso) {
       iniciarContagem();
     }
   }
@@ -57,17 +132,13 @@ class PdvDescansoController extends GetxController {
       return;
     }
 
-    // O descanso só pode existir em E|2.
     if (novoStatus != 2) {
-      final estavaAberto = telaDescansoAtiva.value;
+      cancelarDescanso();
+      return;
+    }
 
-      telaDescansoAtiva.value = false;
-      _cancelarTimer();
-
-      if (estavaAberto) {
-        unawaited(_focarPdv());
-      }
-
+    if (!podeExibirDescanso) {
+      cancelarDescanso();
       return;
     }
 
@@ -75,11 +146,7 @@ class PdvDescansoController extends GetxController {
   }
 
   void iniciarContagem() {
-    if (!habilitado) {
-      return;
-    }
-
-    if (telaController.status.value != 2) {
+    if (!podeExibirDescanso) {
       _cancelarTimer();
       return;
     }
@@ -98,7 +165,7 @@ class PdvDescansoController extends GetxController {
     _cancelarTimer();
 
     _timer = Timer(Duration(seconds: appConfig.tempoDescansoSegundos), () {
-      if (telaController.status.value != 2) {
+      if (!podeExibirDescanso) {
         return;
       }
 
@@ -107,11 +174,7 @@ class PdvDescansoController extends GetxController {
   }
 
   void registrarInteracao() {
-    if (!habilitado) {
-      return;
-    }
-
-    if (telaController.status.value != 2) {
+    if (!podeExibirDescanso) {
       return;
     }
 
@@ -124,11 +187,7 @@ class PdvDescansoController extends GetxController {
   }
 
   Future<void> abrirTelaDescanso() async {
-    if (!habilitado) {
-      return;
-    }
-
-    if (telaController.status.value != 2) {
+    if (!podeExibirDescanso) {
       return;
     }
 
@@ -140,15 +199,14 @@ class PdvDescansoController extends GetxController {
 
     telaDescansoAtiva.value = true;
 
-    // Dá tempo para o widget do vídeo entrar na árvore
-    // e o FocusNode interno ser criado.
     await Future.delayed(const Duration(milliseconds: 300));
 
     if (!telaDescansoAtiva.value) {
       return;
     }
 
-    if (telaController.status.value != 2) {
+    if (!podeExibirDescanso) {
+      telaDescansoAtiva.value = false;
       return;
     }
 
@@ -162,11 +220,9 @@ class PdvDescansoController extends GetxController {
 
     telaDescansoAtiva.value = false;
 
-    // A tecla que chegou ao Flutter morre aqui.
-    // Depois devolvemos o teclado ao PDV.
     await _focarPdv();
 
-    if (telaController.status.value == 2) {
+    if (podeExibirDescanso) {
       iniciarContagem();
     }
 
@@ -267,7 +323,17 @@ class PdvDescansoController extends GetxController {
   @override
   void onClose() {
     _cancelarTimer();
+
     _statusWorker?.dispose();
+    _fechamentoWorker?.dispose();
+
+    _gavetaWorker?.dispose();
+    _cargaWorker?.dispose();
+    _sangriaWorker?.dispose();
+    _leituraXWorker?.dispose();
+    _interfaceWorker?.dispose();
+    _cancelamentoWorker?.dispose();
+    _consultaWorker?.dispose();
 
     super.onClose();
   }
