@@ -37,7 +37,6 @@ class PdvTelaController extends GetxController {
   // ABRIR GAVETA
   // ============================================================
   final RxBool telaAbrirGavetaAtiva = false.obs;
-
   int? _statusAntesGaveta;
 
   // ============================================================
@@ -52,7 +51,24 @@ class PdvTelaController extends GetxController {
   int? _statusAntesSangria;
 
   // ============================================================
-  // SANFRIA
+  // SAIDA OPERADOR
+  // ============================================================
+  final RxBool telaSaidaOperador = false.obs;
+  int? _statusAntesSaidaOperador;
+
+  // ============================================================
+  // ENTRADA OPERADOR
+  // ============================================================
+  final RxBool telaEntradaOperador = false.obs;
+  int? _statusAntesEntradaOperador;
+
+  // ============================================================
+  // ENTRADA OPERADOR
+  // ============================================================
+  final RxBool telaPdvFechado = false.obs;
+
+  // ============================================================
+  // SANGRIA
   // ============================================================
   final RxBool telaLeituraX = false.obs;
 
@@ -153,7 +169,10 @@ class PdvTelaController extends GetxController {
   bool get temTelaOperacionalAtiva {
     return telaAbrirGavetaAtiva.value ||
         telaCarga.value ||
+        telaPdvFechado.value ||
         telaSangria.value ||
+        telaSaidaOperador.value ||
+        telaEntradaOperador.value ||
         telaLeituraX.value ||
         telaInterfaceAtiva.value ||
         telaCancelamentoAtiva.value ||
@@ -245,7 +264,7 @@ class PdvTelaController extends GetxController {
     telaSangria.value = true;
 
     print('======================================');
-    print('TELA sSANGRIA ATIVADA');
+    print('TELA SANGRIA ATIVADA');
     print(
       'telaSangria: '
       '${telaSangria.value}',
@@ -260,6 +279,78 @@ class PdvTelaController extends GetxController {
 
     print('======================================');
     print('TELA SANGRIA FINALIZADA');
+    print('======================================');
+  }
+
+  // ABRE TELA SAIDA OPERADOR
+  void abrirTelaOperador() {
+    _statusAntesSaidaOperador = status.value;
+    telaSaidaOperador.value = true;
+
+    print('======================================');
+    print('TELA SAIDA OPERADOR ATIVADA');
+    print(
+      'telasaidaoperador: '
+      '${telaSaidaOperador.value}',
+    );
+    print('======================================');
+  }
+
+  // FECHA TELA SAIDA OPERADOR
+  void fechaTelaSaidaOperador() {
+    telaSaidaOperador.value = false;
+    _statusAntesSaidaOperador = null;
+
+    print('======================================');
+    print('TELA SAIDA OPERADOR FINALIZADA');
+    print('======================================');
+  }
+
+  // ABRE TELA ENTRADA OPERADOR
+  void abrirTelaEntradaOperador() {
+    _statusAntesEntradaOperador = status.value;
+    telaPdvFechado.value = false;
+    telaEntradaOperador.value = true;
+
+    print('======================================');
+    print('TELA ENTRADA OPERADOR ATIVADA');
+    print('telaentradaoperador: ${telaEntradaOperador.value}');
+    print('telaPdvFechado: ${telaPdvFechado.value}');
+    print('======================================');
+    print('======================================');
+  }
+
+  // FECHA TELA SAIDA OPERADOR
+  void fechaTelaEntradorOperador() {
+    telaEntradaOperador.value = false;
+    _statusAntesEntradaOperador = null;
+
+    print('======================================');
+    print('TELA ENTRADA OPERADOR FINALIZADA');
+    print('======================================');
+  }
+
+  // ABRE TELA FECHADO
+  void abrirTelaFechado() {
+    // _statusAntesFechado = status.value;
+    telaPdvFechado.value = true;
+
+    print('======================================');
+    print('TELA FECHADO ATIVADA');
+    print(
+      'telaFechado: '
+      '${telaPdvFechado.value}',
+    );
+    print('======================================');
+  }
+
+  // FECHA TELA FECHADO
+  void fechaTelafechado() {
+    telaPdvFechado.value = false;
+    // _statusAntesFechado = null;
+
+    print('======================================');
+    print('TELA FECHADO FINALIZADA');
     print('======================================');
   }
 
@@ -673,7 +764,10 @@ class PdvTelaController extends GetxController {
     // FECHANDO TELA LEITURA X
     // ==================================================
     if (telaLeituraX.value &&
-        (novoStatus == 2 || novoStatus == 3 || novoStatus == 4)) {
+        (novoStatus == 1 ||
+            novoStatus == 2 ||
+            novoStatus == 3 ||
+            novoStatus == 4)) {
       fechaTelaLeituraX();
     }
 
@@ -689,6 +783,32 @@ class PdvTelaController extends GetxController {
         novoStatus == _statusAntesGaveta) {
       fechaTelaGaveta();
     }
+
+    // ==================================================
+    // FECHA TELA SAIDA OPERADOR
+    // ==================================================
+    if (telaSaidaOperador.value &&
+        _statusAntesSaidaOperador != null &&
+        novoStatus == _statusAntesSaidaOperador) {
+      fechaTelaSaidaOperador();
+    }
+
+    // ==================================================
+    // FECHA TELA ENTRADA OPERADOR
+    // ==================================================
+    if (telaEntradaOperador.value &&
+        _statusAntesEntradaOperador != null &&
+        novoStatus == _statusAntesEntradaOperador) {
+      fechaTelaEntradorOperador();
+    }
+
+    // ==================================================
+    // FECHA TELA FECHADO
+    // ==================================================
+    if (novoStatus == 1 && telaPdvFechado.value) {
+      fechaTelafechado();
+    }
+
     // ==================================================
     // DISPLAY
     // ==================================================
@@ -867,6 +987,27 @@ class PdvTelaController extends GetxController {
     // 110 - SANGRIA
     if (codigo == 110 && subtipo.toUpperCase() == 'I') {
       abrirTelaSangria();
+      return;
+    }
+
+    // 106 - SAIDA OPERADOR
+    if (codigo == 106 && subtipo.toUpperCase() == 'I') {
+      abrirTelaOperador();
+      return;
+    }
+
+    // 103 - ENTRADA OPERADOR
+    if (codigo == 103 && subtipo.toUpperCase() == 'I') {
+      abrirTelaEntradaOperador();
+      return;
+    }
+
+    // 112 - FECHADO
+    if (codigo == 112 && subtipo.toUpperCase() == 'I') {
+      if (status.value == 1) {
+        abrirTelaFechado();
+      }
+
       return;
     }
 

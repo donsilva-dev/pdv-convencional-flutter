@@ -6,6 +6,8 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:media_kit/media_kit.dart';
 import 'package:pdv_convencional/screens/home_screen.dart';
+import 'package:pdv_convencional/widgets/pdv_fechado.dart';
+import 'package:pdv_convencional/widgets/pdv_saida_operador.dart';
 import 'package:window_manager/window_manager.dart';
 import 'bindings/pdv_binding.dart';
 import 'models/app_config.dart';
